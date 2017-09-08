@@ -23,11 +23,12 @@ module.exports = class GameMaster {
     this.Enemy_Left_Count;
     this.My_KING_HP;
     this.Enemy_KING_HP;
+    this.tmp_count;
     // ユニットの作成 & ボードに配置
     this.units;
     this.move_units;
 
-  	// this.Unit_Plans;
+    // this.Unit_Plans;
     this.play_mode;
     this.IsGameOver;
     this.chara_Dic =[
@@ -80,6 +81,7 @@ module.exports = class GameMaster {
     this.Enemy_Left_Count = 6;
     this.My_KING_HP = 500;
     this.Enemy_KING_HP = 500;
+    this.tmp_count = 0;
 
     // ユニットの作成 & ボードに配置
     this.units = [];
@@ -272,6 +274,7 @@ module.exports = class GameMaster {
       break;
       case "GAME_OVER":
       this.GameOverPhase();
+      // Debug.Log("tmp_count:"+tmp_count);
       return;
     }
     this.NextPhase();    

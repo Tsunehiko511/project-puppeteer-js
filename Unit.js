@@ -16,7 +16,7 @@ module.exports = class Unit{
 		this.filter2;
 		this.target_condition;
 		this.action;
-		this.plans;
+		this.ais;
 		this.Max_hp;
 		this.hp;
 		this.attack; 				// 現在の状態
@@ -92,7 +92,7 @@ module.exports = class Unit{
 		this.stamina 	= _stamina;
 		this.type 		= this.GetType(_id, _player);
 		this._id 		= _id;
-		this.plans 		= _plans;
+		this.ais 		= _plans;
 
 		this.plan 	= 0;
 		this.charge = 0;
@@ -260,24 +260,24 @@ module.exports = class Unit{
 		}
 		return false;
 	}
-	IsActionSelect(_elements, _gameMaster){
+	IsActionSelect(_plans, _i, _gameMaster){
 		// Idの場所を取得
-		if(this.plan != _elements.id){
+		if(this.plan != _i){
 			return false;      // 次のプラン
 		}
 
 		// ターゲット条件を確認し，アクションを決定する
 		for(let i=0; i<5; i++){
-			if(this.SetTarget(this.plans.GetPlan(this.plan).elements.GetRow(i)[0], 
-									this.plans.GetPlan(this.plan).elements.GetRow(i)[1], 
-									this.plans.GetPlan(this.plan).elements.GetRow(i)[2],
-									this.ChangeSkill(this.plans.GetPlan(this.plan).elements.GetRow(i)[3]),
+			if(this.SetTarget(this.ais.plans[this.plan].elements.rows[i][0], 
+									this.ais.plans[this.plan].elements.rows[i][1], 
+									this.ais.plans[this.plan].elements.rows[i][2],
+									this.ChangeSkill(this.ais.plans[this.plan].elements.rows[i][3]),
 									_gameMaster)
 			){
-				this.filter1 = _elements.GetRow(i)[0];
-				this.filter2 = _elements.GetRow(i)[1];
-				this.target_condition = _elements.GetRow(i)[2];
-				this.action = this.ChangeSkill(_elements.GetRow(i)[3]);
+				this.filter1 = _plans[_i].elements.rows[i][0];
+				this.filter2 = _plans[_i].elements.rows[i][1];
+				this.target_condition = _plans[_i].elements.rows[i][2];
+				this.action = this.ChangeSkill(_plans[_i].elements.rows[i][3]);
 				return true; 
 			}
 		}
@@ -290,7 +290,7 @@ module.exports = class Unit{
 	}
 
   // 単純に現在のPlanから回す _transitions.id
-  DoTransition(_plans, _gameMaster){
+  DoTransition(_unit, _gameMaster){
   	let idx = this.connectStartId;// 現在のPlanを取得
 	if(idx < 0){
   		idx = 0;
@@ -300,15 +300,16 @@ module.exports = class Unit{
   		let num = (i+idx)%6;
   		for(let j=0; j<5; j++){
 			// if(_plans.GetPlan(num).transitions.GetRow(j).length == 0){}
-			if(this.IsPlanSelect(_plans.GetPlan(num).transitions.id, _plans.GetPlan(num).transitions.GetRow(j)[0], _plans.GetPlan(num).transitions.GetRow(j)[1], _plans.GetPlan(num).transitions.GetRow(j)[2]-1)){
-				this.connectStartId = _plans.GetPlan(num).transitions.GetRow(j)[2]-1;
+			// if(this.IsPlanSelect(_unit.plans[num].transitions.id, _unit.plans[num].transitions.rows[j][0], _unit.plans[num].transitions.rows[j][1], _unit.plans[num].transitions.rows[j][2]-1)){
+			if(this.IsPlanSelect(num, _unit.plans[num].transitions.rows[j][0], _unit.plans[num].transitions.rows[j][1], _unit.plans[num].transitions.rows[j][2]-1)){
+				this.connectStartId = _unit.plans[num].transitions.rows[j][2]-1;
 				break;
 			}
   		}
   	}
   	// 条件から行動を選択
   	for(let i=0; i<6; i++){
-  		if(this.IsActionSelect(_plans.GetPlan(i).elements, _gameMaster)){
+  		if(this.IsActionSelect(_unit.plans, i, _gameMaster)){
   			break;
   		}
   	}
@@ -336,7 +337,7 @@ module.exports = class Unit{
 		this.SetUnitCount(_gameMaster);
 		this.DieCountEvent(_gameMaster);
 		// 状態遷移
-		this.DoTransition(this.plans, _gameMaster);
+		this.DoTransition(this.ais, _gameMaster);
 	}
 
 	SetMINEHPEvent(){

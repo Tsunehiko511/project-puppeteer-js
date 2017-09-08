@@ -1,6 +1,5 @@
 module.exports = class Plan{
-	constructor(_id, _transitions, _elements){
-        this.id = _id;
+	constructor(_transitions, _elements){
         this.transitions = _transitions;
         this.elements = _elements;
     }
