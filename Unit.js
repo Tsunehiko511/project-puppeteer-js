@@ -572,6 +572,10 @@ module.exports = class Unit{
 
 	DieCountEvent(_gameMaster){
 		let tmp_die_count = _gameMaster.Die_Count;
+		let tmp_id = this._id;
+		if(this.team == "Enemy"){
+			tmp_id += 4;
+		}
 		if(tmp_die_count[this._id] == 0){
 			this.plan_eventFlags[Constants.F_DIE_COUNT_0] = true;
 		}
@@ -1932,14 +1936,14 @@ module.exports = class Unit{
 	--------------*/
 	DownWaitTime(_moved_waitTime){
 		if(this.stamina <= 1){
-			_moved_waitTime = _moved_waitTime/2;
+			_moved_waitTime = Math.floor(_moved_waitTime/2);
 		}
 		this.waitTime -= _moved_waitTime;
 	}
 	ResetWaitTime(){
 		if(this.speedUP > 0){
 			this.speedUP--;
-			this.waitTime = this.waitTime_max/2;
+			this.waitTime = Math.floor(this.waitTime_max/2);
 			return;
 		}
 		this.waitTime = this.waitTime_max;
